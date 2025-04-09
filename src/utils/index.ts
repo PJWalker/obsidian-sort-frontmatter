@@ -1,18 +1,17 @@
 import { Variant } from "../parser/MarkdownParser.types";
+import { Settings } from "../settings";
 
 export function isObject(variant: Variant): boolean {
 	return Object.prototype.toString.call(variant) === "[object Object]";
 }
 
-export function sortBy(a: Variant, b: Variant) {
-	// overly complicated code to ensure that if i ever change to a simpler parser, the parsing can still identify numbers.
-	if ([a, b].every((item) => /[\d].*/.exec(String(item)))) {
-		return Number(a as number) - Number(b as number);
-	}
-	if ([a, b].every((item) => typeof item === "string")) {
-		const letterFore = (a as string).charCodeAt(0);
-		const letterAft = (b as string).charCodeAt(0);
-		return letterFore - letterAft;
-	}
-	return 0;
+let comparator: (a: any, b: any) => number
+
+export async function updateComparator({locale, caseSensitive, numericSort} : Settings) {
+    comparator = new Intl.Collator(locale, {
+        sensitivity: caseSensitive ? "case" : "base",
+        numeric: numericSort,
+    }).compare;
 }
+
+export const sortBy = (a: any, b: any) => { console.log(a, b, comparator(a,b));  return comparator(a, b); };

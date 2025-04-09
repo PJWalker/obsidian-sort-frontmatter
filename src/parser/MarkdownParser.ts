@@ -2,7 +2,7 @@ import { App, TFile, parseYaml } from "obsidian";
 import { ProcessFrontMatterSpec } from "../utils/types";
 import * as jsyaml from "js-yaml";
 import { isObject, sortBy } from "../utils";
-import { Literal, RecurseVariant, Variant } from "./MarkdownParser.types";
+import { RecurseVariant, Variant } from "./MarkdownParser.types";
 
 interface MarkdownParserImpl {
   splitIntoFrontMatterAndContents: (
@@ -15,8 +15,7 @@ interface MarkdownParserImpl {
   } | null;
   replaceFileContentsWithSortedFrontMatter: (
     frontMatter: string,
-    content: string,
-    sortBy: (a: Variant, b: Variant) => number
+    content: string
   ) => string;
   convertObjToYaml: (
     obj: Record<string, unknown>,
@@ -34,8 +33,7 @@ export class MarkdownParser implements MarkdownParserImpl {
 
   public replaceFileContentsWithSortedFrontMatter(
     frontMatter: string,
-    content: string,
-    sortBy: (a: Literal, b: Literal) => number
+    content: string
   ): ReturnType<typeof replaceFileContentsWithSortedFrontMatter> {
     throw new Error("Method not implemented.");
   }
@@ -86,8 +84,7 @@ export function convertObjToYaml(
 
 export function replaceFileContentsWithSortedFrontMatter(
   frontMatter: string,
-  content: string,
-  sortBy: (a: Variant, b: Variant) => number
+  content: string
 ): string {
   const parsedFm = parseYaml(frontMatter);
 

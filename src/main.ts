@@ -1,12 +1,14 @@
 import { App, Plugin, PluginManifest, TFile, Vault, Workspace } from "obsidian";
 import { MarkdownParser } from "./parser/MarkdownParser";
 import { Variant } from "./parser/MarkdownParser.types";
-import { sortBy } from "./utils";
+import { updateComparator } from "./utils";
+import { DEFAULT_SETTINGS, SettingTab } from "./settings";
 
 let workspace: Workspace,
   // fileManager: FileManager,
   vault: Vault;
 export default class Main extends Plugin {
+  settings: any;
   constructor(app: App, plugin: PluginManifest) {
     super(app, plugin);
 
@@ -16,8 +18,7 @@ export default class Main extends Plugin {
   }
 
   async #genSortFrontMatterWithinContents(
-    tFile: TFile,
-    sortBy: (a: Variant, b: Variant) => number
+    tFile: TFile
   ): Promise<{ data: string; err: Error | null }> {
     const app = this.app;
     return new Promise((res, rej) => {
@@ -45,8 +46,7 @@ export default class Main extends Plugin {
         const sorted_file_contents =
           parser.replaceFileContentsWithSortedFrontMatter(
             processedFrontMatter.frontMatter || "",
-            processedNonFrontMatter.content || "",
-            sortBy
+            processedNonFrontMatter.content || ""
           );
 
         res({ data: sorted_file_contents, err: null });
@@ -56,21 +56,30 @@ export default class Main extends Plugin {
   }
 
   public async genSortActiveFrontmatter(datums: unknown[]): Promise<void> {
+    updateComparator(this.settings);
     await this.#genSortFrontMatterWithinContents(
-      workspace.getActiveFile(),
-      sortBy
+      workspace.getActiveFile()
     );
   }
 
   public async genSortAllFrontmatter(datums: unknown[]): Promise<void> {
+    updateComparator(this.settings);
     await Promise.all(
-      workspace.getFiles().forEach(
-        file => this.#genSortFrontMatterWithinContents(file,sortBy)
+      vault.getFiles().map(
+        file => this.#genSortFrontMatterWithinContents(file)
       )
     );
   }
-  
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
   async onload() {
+    await this.loadSettings();
+    updateComparator(this.settings);
+
+
     this.addCommand({
       id: "sort",
       name: "Sort frontmatter for current file",
@@ -85,6 +94,14 @@ export default class Main extends Plugin {
         await this.genSortAllFrontmatter(args);
       },
     });
+
+    this.addSettingTab(new SettingTab(this.app, this));
+  }
+
+
+
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 
   onunload() {}

@@ -97,8 +97,7 @@ describe("MarkdownParser::replaceFileContentsWithSortedFrontMatter", () => {
     const actual_markdown =
       MarkdownParser.replaceFileContentsWithSortedFrontMatter(
         actual.processedFrontMatter.frontMatter,
-        actual.processedNonFrontMatter.content,
-        utils.sortBy
+        actual.processedNonFrontMatter.content
       );
 
     //
@@ -124,8 +123,7 @@ describe("MarkdownParser::replaceFileContentsWithSortedFrontMatter", () => {
     const actual_markdown =
       MarkdownParser.replaceFileContentsWithSortedFrontMatter(
         actual.processedFrontMatter.frontMatter,
-        actual.processedNonFrontMatter.content,
-        utils.sortBy
+        actual.processedNonFrontMatter.content
       );
 
     expect(expected_markdown).toEqual(actual_markdown);
