@@ -55,18 +55,34 @@ export default class Main extends Plugin {
     });
   }
 
-  public async genSortFrontmatter(datums: unknown[]): Promise<void> {
+  public async genSortActiveFrontmatter(datums: unknown[]): Promise<void> {
     await this.#genSortFrontMatterWithinContents(
       workspace.getActiveFile(),
       sortBy
     );
   }
+
+  public async genSortAllFrontmatter(datums: unknown[]): Promise<void> {
+    await Promise.all(
+      workspace.getFiles().forEach(
+        file => this.#genSortFrontMatterWithinContents(file,sortBy)
+      )
+    );
+  }
+  
   async onload() {
     this.addCommand({
       id: "sort",
-      name: "Sort frontmatter",
+      name: "Sort frontmatter for current file",
       callback: async (...args) => {
-        await this.genSortFrontmatter(args);
+        await this.genSortActiveFrontmatter(args);
+      },
+    });
+    this.addCommand({
+      id: "sortAll",
+      name: "Sort all frontmatter in the vault",
+      callback: async (...args) => {
+        await this.genSortAllFrontmatter(args);
       },
     });
   }
