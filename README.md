@@ -10,7 +10,7 @@ See [[README_DEV.md]] for a walkthrough on the technical side.
 As far as **usage** is concerned, the procedure is as follows:
 
 - Open up the Command Palette
-- Type `Sort Frontmatter` and activate `Sort Front matter for current file` or `Sort all frontmatter in the vault`
+- Type `Sort Frontmatter` and activate `Sort frontmatter for current file` or `Sort all frontmatter in the vault`
 
 ## Tradeoffs
 
