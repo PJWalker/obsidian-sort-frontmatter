@@ -1,19 +1,20 @@
 import { App, PluginSettingTab, Setting, TextComponent } from "obsidian";
 import Main from "./main";
-import { updateComparator } from "./utils";
+import { updateComparator } from "./comparator";
+import { sortBy } from "./comparator";
 
 export interface Settings {
-  caseSensitive: boolean;
-  numericSort: boolean;
+  sortStrategy: "codepoint" | "natural";
   locale: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   // Keeping things backward compatible by default
-  caseSensitive: true,
-  numericSort: false,
+  sortStrategy: "codepoint",
   locale: navigator.language,
 };
+
+const previewItems = ["apple", "BANANA", "carrot", "11 Apples", "2D", "99luftballons"];
 
 export class SettingTab extends PluginSettingTab {
   plugin: Main;
@@ -26,37 +27,26 @@ export class SettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
+    let preview : Setting;
+    const updatePreview = ()=> preview.setDesc(previewItems.sort(sortBy).join(", "))
 
     new Setting(containerEl)
-      .setName("Case Sensitive")
-      .setDesc(`Should 'B' go before 'a'?`)
-      .addToggle(toggle =>
-        toggle.setValue(this.plugin.settings.caseSensitive).onChange(
-          async (value) => {
-            this.plugin.settings.caseSensitive = value;
-            await this.plugin.saveSettings();
-            updateComparator(this.plugin.settings);
-          }
-        )
-      );
+      .setName("Sorting Strategy")
+      .setDesc(`Should 'BANANA' go before 'apple'?`)
+      .addDropdown(dropdown =>
+        dropdown.addOption("codepoint", "Codepoint").addOption("natural", "Natural").onChange(async value => {
+          this.plugin.settings.sortStrategy = value;
+          await this.plugin.saveSettings()
+          updateComparator(this.plugin.settings);
+          updatePreview();
 
-    new Setting(containerEl)
-      .setName("Numeric Sort")
-      .setDesc(`Should 'Chapter 2' go before 'Chapter 10'?`)
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.numericSort)
-          .onChange(async (value) => {
-            this.plugin.settings.numericSort = value;
-            await this.plugin.saveSettings();
-            updateComparator(this.plugin.settings);
-          })
-      );
+        })
+    );
 
     new Setting(containerEl)
       .setName("Locale")
       .setDesc(
-        `Use a custom locale for sorting (defaults to your system locale)`
+        `Use a custom locale for natural sorting (defaults to your system locale)`
       )
       .addText((text: TextComponent) =>
         text.setValue(this.plugin.settings.locale).setPlaceholder(`e.g: en, fr, es`).onChange(
@@ -64,8 +54,14 @@ export class SettingTab extends PluginSettingTab {
             this.plugin.settings.locale = value;
             await this.plugin.saveSettings();
             updateComparator(this.plugin.settings);
+            updatePreview();
+
           }
         )
-      )
-    }
+    )
+    preview = new Setting(containerEl).setName("Preview");
+    updatePreview();
+  }
+
+
 }

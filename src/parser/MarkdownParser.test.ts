@@ -1,6 +1,5 @@
 import { splitIntoFrontMatterAndContents } from "./MarkdownParser";
 import * as MarkdownParser from "./MarkdownParser";
-import * as utils from "../utils/index";
 import * as yaml from "yaml";
 import dedent from "dedent";
 jest.mock(

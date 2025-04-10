@@ -1,7 +1,8 @@
 import { App, TFile, parseYaml } from "obsidian";
 import { ProcessFrontMatterSpec } from "../utils/types";
 import * as jsyaml from "js-yaml";
-import { isObject, sortBy } from "../utils";
+import { isObject } from "../utils";
+import { sortBy } from "src/comparator";
 import { RecurseVariant, Variant } from "./MarkdownParser.types";
 
 interface MarkdownParserImpl {

@@ -1,18 +1,15 @@
 import { App, Plugin, PluginManifest, TFile, Vault, Workspace } from "obsidian";
 import { MarkdownParser } from "./parser/MarkdownParser";
 import { Variant } from "./parser/MarkdownParser.types";
-import { updateComparator } from "./utils";
+import { updateComparator } from "./comparator";
 import { DEFAULT_SETTINGS, SettingTab } from "./settings";
 
 let workspace: Workspace,
-  // fileManager: FileManager,
   vault: Vault;
 export default class Main extends Plugin {
   settings: any;
   constructor(app: App, plugin: PluginManifest) {
     super(app, plugin);
-
-    // fileManager = this.app.fileManager;
     workspace = this.app.workspace;
     vault = this.app.vault;
   }
